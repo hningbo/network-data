@@ -1,6 +1,7 @@
-package edu.rylynn;
+package edu.rylynn.netdata.mail.core;
 
 import org.pcap4j.core.*;
+import org.pcap4j.packet.IllegalRawDataException;
 import org.pcap4j.packet.IpV4Packet;
 import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.TcpPacket;
@@ -15,6 +16,7 @@ import java.util.List;
  */
 public class App 
 {
+
     public static void main( String[] args ) throws UnknownHostException, PcapNativeException, NotOpenException, InterruptedException {
         List<PcapNetworkInterface> alldev = Pcaps.findAllDevs();
         System.out.println(alldev);
@@ -31,7 +33,11 @@ public class App
         PacketListener listener = new PacketListener() {
             @Override
             public void gotPacket(Packet packet) {
-                System.out.println(packet.getHeader());
+                try {
+                    System.out.println(TcpPacket.newPacket(packet.getRawData(), 5, packet.length()));
+                } catch (IllegalRawDataException e) {
+                    e.printStackTrace();
+                }
             }
         };
         handle.loop(COUNT, listener);
