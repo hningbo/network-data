@@ -1,4 +1,4 @@
-package edu.rylynn.netdata.mail.entity;
+package edu.rylynn.netdata.entity;
 
 public class Relation {
     private String A;

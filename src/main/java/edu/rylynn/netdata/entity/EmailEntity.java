@@ -1,4 +1,4 @@
-package edu.rylynn.netdata.mail.entity;
+package edu.rylynn.netdata.entity;
 
 import java.util.Date;
 
