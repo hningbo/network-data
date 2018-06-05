@@ -8,14 +8,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class ListenerMail implements PacketListener {
+public abstract class AbstractWebMailListener implements PacketListener {
     protected Map<TCPTuple, List<TcpPacket>> cache;
+
+    public AbstractWebMailListener() {
+        this.cache = new HashMap<>();
+    }
 
     public Map<TCPTuple, List<TcpPacket>> getCache() {
         return cache;
     }
 
-    public ListenerMail(){
-        this.cache = new HashMap<>();
+    public void clearCache() {
+        this.cache.clear();
     }
 }

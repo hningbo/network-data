@@ -1,21 +1,16 @@
 package edu.rylynn.netdata.core.mail.processor;
 
-import edu.rylynn.netdata.core.mail.listener.ListenerMail;
-import edu.rylynn.netdata.entity.TCPTuple;
-import org.pcap4j.packet.TcpPacket;
-
-import java.util.List;
-import java.util.Map;
+import edu.rylynn.netdata.core.mail.listener.AbstractWebMailListener;
 
 public class Process21CN extends AbstractProcessor{
 
-    public Process21CN(ListenerMail listenerMail) {
+    public Process21CN(AbstractWebMailListener listenerMail) {
         super(listenerMail);
     }
 
     @Override
-    public void sendMailExtract() {
-
+    public void sendMailExtract(String httpContent) {
+        //todo :recover the mail from the http content
     }
 
     @Override

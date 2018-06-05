@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class Listener21CN extends ListenerMail {
+public class Listener21CN extends AbstractWebMailListener {
 
     @Override
     public void gotPacket(Packet packet) {
@@ -24,7 +24,7 @@ public class Listener21CN extends ListenerMail {
         try {
             ipV4Packet = IpV4Packet.newPacket(packet.getPayload().getRawData(), 0, packet.getPayload().length());
             tcpPacket = TcpPacket.newPacket(packet.getPayload().getPayload().getRawData(), 0, packet.getPayload().getPayload().length());
-            if (tcpPacket.getHeader().getDstPort().valueAsInt() == 80) {
+            if (tcpPacket.getHeader().getDstPort().valueAsInt() == 80 || tcpPacket.getHeader().getSrcPort().valueAsInt() == 80) {
                 String httpContent = EnDeCoder.hexStringToString(tcpPacket.toHexString());
                 mailSendMatch = mailSendPattern.matcher(httpContent).find();
                 TCPTuple tuple = new TCPTuple(ipV4Packet.getHeader().getSrcAddr(), ipV4Packet.getHeader().getDstAddr(), tcpPacket.getHeader().getSrcPort().valueAsInt(), tcpPacket.getHeader().getDstPort().valueAsInt());
@@ -33,19 +33,22 @@ public class Listener21CN extends ListenerMail {
                     List<TcpPacket> packetList = new ArrayList<>();
                     packetList.add(tcpPacket);
                     cache.put(tuple, packetList);
-                    return;
-                }
-                mailRecieveMatch = mailRecievePattern.matcher(httpContent).find();
-                if (mailRecieveMatch) {
-                    List<TcpPacket> packetList = new ArrayList<>();
-                    packetList.add(tcpPacket);
-                    cache.put(tuple, packetList);
-                    return;
-                }
-                if (cache.containsKey(tuple)) {
+                    System.out.println("***********"+tuple+"************");
 
+                    return;
+                }
+//                mailRecieveMatch = mailRecievePattern.matcher(httpContent).find();
+//                if (mailRecieveMatch) {
+//                    List<TcpPacket> packetList = new ArrayList<>();
+//                    packetList.add(tcpPacket);
+//                    cache.put(tuple, packetList);
+//                    return;
+//                }
+
+                if (cache.containsKey(tuple)) {
                     List<TcpPacket> packetList = cache.get(tuple);
                     packetList.add(tcpPacket);
+                    cache.put(tuple, packetList);
                 }
             }
         } catch (IllegalRawDataException e) {

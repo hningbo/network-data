@@ -7,7 +7,6 @@ public class TCPTuple {
     private Inet4Address dstAddress;
     private int srcPort;
     private int dstPort;
-    private int hash;
 
     public TCPTuple(Inet4Address srcAddress, Inet4Address dstAddress, int srcPort, int dstPort) {
         this.srcAddress = srcAddress;
@@ -34,14 +33,23 @@ public class TCPTuple {
 
     @Override
     public int hashCode() {
-        this.hash = srcAddress.getHostAddress().hashCode() + srcPort + dstAddress.getHostAddress().hashCode() + dstPort;
-        return this.hash;
+        return srcAddress.getHostAddress().hashCode() + srcPort + dstAddress.getHostAddress().hashCode() + dstPort;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        TCPTuple anotherTuple = (TCPTuple)obj;
+        return (srcAddress.getHostAddress().equals(anotherTuple.dstAddress.getHostAddress()) &&
+                dstAddress.getHostAddress().equals(anotherTuple.srcAddress.getHostAddress()) &&
+                srcPort == anotherTuple.dstPort && dstPort == anotherTuple.srcPort) ||
+                (srcAddress.getHostAddress().equals(anotherTuple.srcAddress.getHostAddress()) &&
+                        dstAddress.getHostAddress().equals(anotherTuple.dstAddress.getHostAddress()) &&
+                        srcPort == anotherTuple.srcPort && dstPort == anotherTuple.dstPort);
+
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("src: ").append(srcAddress.getHostAddress()).append(" ").append(srcPort).append(" dst: ").append(dstAddress).append(" ").append(dstPort).append(" ").append(this.hashCode());
-        return sb.toString();
+        return "src: " + srcAddress.getHostAddress() + ":" + srcPort + " dst: " + dstAddress + ":" + dstPort + " " + this.hashCode();
     }
 }

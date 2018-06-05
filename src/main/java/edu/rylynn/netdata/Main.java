@@ -1,7 +1,7 @@
 package edu.rylynn.netdata;
 
 import edu.rylynn.netdata.core.mail.listener.Listener21CN;
-import edu.rylynn.netdata.core.mail.listener.ListenerMail;
+import edu.rylynn.netdata.core.mail.listener.AbstractWebMailListener;
 import edu.rylynn.netdata.core.mail.processor.Process21CN;
 import org.pcap4j.core.*;
 
@@ -23,7 +23,7 @@ public class Main {
         try {
             handle = Pcaps.openOffline("./send_mail.gz.pcap");
             int COUNT = 0;
-            ListenerMail listener = new Listener21CN();
+            AbstractWebMailListener listener = new Listener21CN();
 
             handle.setFilter("tcp", BpfProgram.BpfCompileMode.OPTIMIZE);
             new Process21CN(listener).start();
