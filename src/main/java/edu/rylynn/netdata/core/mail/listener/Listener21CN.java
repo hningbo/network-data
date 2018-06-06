@@ -34,7 +34,6 @@ public class Listener21CN extends AbstractWebMailListener {
                     packetList.add(tcpPacket);
                     cache.put(tuple, packetList);
                     System.out.println("***********"+tuple+"************");
-
                     return;
                 }
 //                mailRecieveMatch = mailRecievePattern.matcher(httpContent).find();

@@ -10,10 +10,10 @@ import java.util.*;
 
 public abstract class AbstractProcessor extends Thread {
     protected Map<TCPTuple, List<TcpPacket>> cache;
+    protected AbstractWebMailListener listener;
 
     public AbstractProcessor(AbstractWebMailListener listener) {
-        this.cache = listener.getCache();
-        listener.clearCache();
+        this.listener = listener;
     }
 
     //tcp 重组以及还原http协议内容
@@ -49,6 +49,7 @@ public abstract class AbstractProcessor extends Thread {
                     tempHttpContent.append(EnDeCoder.hexStringToString(thisHexString));
                 }
                 String httpContent = tempHttpContent.toString();
+                //System.out.println(httpContent);
                 sendMailExtract(httpContent);
             }
         }
@@ -57,12 +58,14 @@ public abstract class AbstractProcessor extends Thread {
 
     public abstract void sendMailExtract(String content);
 
-    public abstract void recieveMailExtract();
+    public abstract void recieveMailExtract(String content);
 
     @Override
     public void run() {
         while (true) {
+            this.cache = listener.getCache();
             process();
+            listener.clearCache();
             try {
                 sleep(5000);
             } catch (InterruptedException e) {
