@@ -4,8 +4,6 @@ import edu.rylynn.netdata.core.mail.listener.AbstractWebMailListener;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Process21CN extends AbstractProcessor {
 
@@ -43,18 +41,25 @@ public class Process21CN extends AbstractProcessor {
         String[] splitContent = httpContent.split(";");
         String formContent = splitContent[splitContent.length - 1];
 
-        for(String formItem :formContent.split("&")){
+        for (String formItem : formContent.split("&")) {
             String[] kv = formItem.split("=");
-            if(kv.length == 1){
+            if (kv.length == 1) {
                 continue;
             }
             form.put(kv[0], kv[1]);
-            System.out.println(kv[0]+" "+kv[1]);
+            System.out.println(kv[0] + " " + kv[1]);
         }
     }
 
     @Override
-    public void recieveMailExtract(String content) {
-
+    public void recieveMailExtract(String httpContent) {
+        Map<String, String> form = new HashMap<>();
+        httpContent = httpContent.replace("%40", "@");
+        httpContent = httpContent.replace("%3C", "<");
+        httpContent = httpContent.replace("%3E", ">");
+        httpContent = httpContent.replace("\r\n", "");
+        System.out.println("------------------------------------");
+        System.out.println(httpContent);
+        System.out.println("------------------------------------");
     }
 }

@@ -6,7 +6,6 @@ import edu.rylynn.netdata.core.mail.processor.Process21CN;
 import org.pcap4j.core.*;
 
 import java.net.UnknownHostException;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws UnknownHostException, PcapNativeException, NotOpenException, InterruptedException {
@@ -24,21 +23,18 @@ public class Main {
 //        AbstractWebMailListener listener = new Listener21CN();
 //        new Process21CN(listener).start();
 //        handle.loop(COUNT, listener);
-
-        PcapHandle handle = null;
+        PcapHandle handle;
         try {
-            handle = Pcaps.openOffline("./send_mail.gz.pcap");
+            handle = Pcaps.openOffline("./21cn_attachment.gz.pcap");
             int COUNT = 0;
             AbstractWebMailListener listener = new Listener21CN();
+            new Process21CN(listener).start();
 
             handle.setFilter("tcp", BpfProgram.BpfCompileMode.OPTIMIZE);
-            new Process21CN(listener).start();
             handle.loop(COUNT, listener);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 }

@@ -1,8 +1,9 @@
 package edu.rylynn.netdata.entity;
 
+import java.io.Serializable;
 import java.net.Inet4Address;
 
-public class TCPTuple {
+public class TCPTuple implements Serializable {
     private Inet4Address srcAddress;
     private Inet4Address dstAddress;
     private int srcPort;
@@ -45,7 +46,6 @@ public class TCPTuple {
                 (srcAddress.getHostAddress().equals(anotherTuple.srcAddress.getHostAddress()) &&
                         dstAddress.getHostAddress().equals(anotherTuple.dstAddress.getHostAddress()) &&
                         srcPort == anotherTuple.srcPort && dstPort == anotherTuple.dstPort);
-
     }
 
     @Override
