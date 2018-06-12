@@ -6,14 +6,12 @@ import org.pcap4j.packet.IllegalRawDataException;
 import org.pcap4j.packet.IpV4Packet;
 import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.TcpPacket;
-import redis.clients.jedis.Jedis;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class Listener21CN extends AbstractWebMailListener {
-
 
     @Override
         public void gotPacket(Packet packet) {
@@ -34,14 +32,7 @@ public class Listener21CN extends AbstractWebMailListener {
                 attachmentMatch = attachmentPattern.matcher(httpContent).find();
                 TCPTuple tuple = new TCPTuple(ipV4Packet.getHeader().getSrcAddr(), ipV4Packet.getHeader().getDstAddr(), tcpPacket.getHeader().getSrcPort().valueAsInt(), tcpPacket.getHeader().getDstPort().valueAsInt());
                 //System.out.println(tuple);
-                if (mailSendMatch) {
-                    List<TcpPacket> packetList = new ArrayList<>();
-                    packetList.add(tcpPacket);
-                    cache.put(tuple, packetList);
-                    System.out.println("***********"+tuple+"************");
-                    return;
-                }
-                if (attachmentMatch) {
+                if (mailSendMatch || attachmentMatch) {
                     List<TcpPacket> packetList = new ArrayList<>();
                     packetList.add(tcpPacket);
                     cache.put(tuple, packetList);
