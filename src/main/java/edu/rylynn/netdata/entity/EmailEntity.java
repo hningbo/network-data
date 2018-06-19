@@ -3,32 +3,34 @@ package edu.rylynn.netdata.entity;
 import java.util.Date;
 
 public class EmailEntity {
-    private String sender;
-    private String reciever;
+    private String from;
+    private String to;
     private Date time;
-    private String cotent;
+    private String subject;
+    private String content;
 
-    public EmailEntity(String sender, String reciever, Date time, String cotent) {
-        this.sender = sender;
-        this.reciever = reciever;
+    public EmailEntity(String from, String to, Date time, String subject, String content) {
+        this.from = from;
+        this.to = to;
         this.time = time;
-        this.cotent = cotent;
+        this.subject = subject;
+        this.content = content;
     }
 
-    public String getSender() {
-        return sender;
+    public String getFrom() {
+        return from;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
+    public void setFrom(String from) {
+        this.from = from;
     }
 
-    public String getReciever() {
-        return reciever;
+    public String getTo() {
+        return to;
     }
 
-    public void setReciever(String reciever) {
-        this.reciever = reciever;
+    public void setTo(String to) {
+        this.to = to;
     }
 
     public Date getTime() {
@@ -39,18 +41,26 @@ public class EmailEntity {
         this.time = time;
     }
 
-    public String getCotent() {
-        return cotent;
+    public String getSubject() {
+        return subject;
     }
 
-    public void setCotent(String cotent) {
-        this.cotent = cotent;
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("sender: ").append(sender).append("\n").append("reciever: ").append(reciever).append("\n");
+        sb.append("sender: ").append(from).append("\n").append("reciever: ").append(to).append("\n").append("subject: ").append(subject).append("\n").append("content: ").append(content).append("\n");
         return sb.toString();
     }
 }

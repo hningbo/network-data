@@ -23,7 +23,7 @@ public class Processor21CN extends AbstractProcessor {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        httpContent = httpContent.replace("\r\n", "");
+        //httpContent = httpContent.replace("\r\n", "");
         //Pattern sessionPattern= Pattern.compile("21CNSESSION_ID=(.*);");
         //Matcher sessionMatcher = sessionPattern.matcher(httpContent);
         System.out.println("------------------------------------");
