@@ -40,10 +40,7 @@ public class TCPTuple implements Serializable {
     @Override
     public boolean equals(Object obj) {
         TCPTuple anotherTuple = (TCPTuple)obj;
-        return (srcAddress.getHostAddress().equals(anotherTuple.dstAddress.getHostAddress()) &&
-                dstAddress.getHostAddress().equals(anotherTuple.srcAddress.getHostAddress()) &&
-                srcPort == anotherTuple.dstPort && dstPort == anotherTuple.srcPort) ||
-                (srcAddress.getHostAddress().equals(anotherTuple.srcAddress.getHostAddress()) &&
+        return (srcAddress.getHostAddress().equals(anotherTuple.srcAddress.getHostAddress()) &&
                         dstAddress.getHostAddress().equals(anotherTuple.dstAddress.getHostAddress()) &&
                         srcPort == anotherTuple.srcPort && dstPort == anotherTuple.dstPort);
     }

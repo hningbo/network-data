@@ -1,14 +1,11 @@
 package edu.rylynn.netdata;
 
 import edu.rylynn.netdata.core.mail.listener.AbstractWebMailListener;
-import edu.rylynn.netdata.core.mail.listener.Listener139;
 import edu.rylynn.netdata.core.mail.listener.Listener21CN;
-import edu.rylynn.netdata.core.mail.processor.Processor139;
 import edu.rylynn.netdata.core.mail.processor.Processor21CN;
 import org.pcap4j.core.*;
 
 import java.net.UnknownHostException;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws UnknownHostException, PcapNativeException, NotOpenException, InterruptedException {
@@ -28,7 +25,7 @@ public class Main {
 //        handle.loop(COUNT, listener);
         PcapHandle handle;
         try {
-            handle = Pcaps.openOffline("./139_nofujian(1).pcap");
+            handle = Pcaps.openOffline("./21cn_attachment.gz.pcap");
             int COUNT = 0;
             AbstractWebMailListener listener = new Listener21CN();
             new Processor21CN(listener).start();

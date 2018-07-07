@@ -18,35 +18,17 @@ public class Processor21CN extends AbstractProcessor {
     @Override
     public void sendMailExtract(String httpContent) {
         Map<String, Object> form = new HashMap<>();
+
         try {
+            httpContent = httpContent.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
             httpContent = URLDecoder.decode(httpContent);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //httpContent = httpContent.replace("\r\n", "");
-        //Pattern sessionPattern= Pattern.compile("21CNSESSION_ID=(.*);");
-        //Matcher sessionMatcher = sessionPattern.matcher(httpContent);
+
         System.out.println("------------------------------------");
         System.out.println(httpContent);
-        //if(sessionMatcher.find()){
-        //    String sessionId = sessionMatcher.group();
-        //    form.put("_id",sessionId.substring(sessionId.lastIndexOf("21CNSESSION_ID"), sessionId.indexOf(";")));
-        //}
-
         System.out.println("------------------------------------");
-
-//        Pattern senderPattern = Pattern.compile("from=[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\\w](?:[\\w-]*[\\w])?\\.)+[\\w](?:[\\w-]*[\\w])?");
-//        Pattern revieverPattern = Pattern.compile("to=.*<[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\\w](?:[\\w-]*[\\w])?\\.)+[\\w](?:[\\w-]*[\\w]>)?");
-//        Matcher senderMatcher = senderPattern.matcher(httpContent);
-//        Matcher recieverMatcher = revieverPattern.matcher(httpContent);
-//        if (senderMatcher.find()) {
-//           String temp = senderMatcher.group();
-//           sender = temp.split("=")[1];
-//        }
-//        if (recieverMatcher.find()){
-//            String temp = recieverMatcher.group();
-//            reciever = temp.split("=")[1];
-//        }
 
         Matcher matcherFrom = Pattern.compile("from=(.*)&orgMailMode").matcher(httpContent);
         Matcher matcherTo = Pattern.compile("to=(.*)&cc").matcher(httpContent);
@@ -72,17 +54,10 @@ public class Processor21CN extends AbstractProcessor {
             String group = matcherFrom.group();
             form.put("from", group.substring(group.lastIndexOf("from=") + 5, group.indexOf("&orgMailMode")));
         }
+
         form.put("time", new Date().toString());
-        handler.insertOne(form);
+        handler.insertMail(form);
     }
 
-    @Override
-    public void recieveMailExtract(String httpContent) {
-        Map<String, String> form = new HashMap<>();
-        httpContent = URLDecoder.decode(httpContent);
-        httpContent = httpContent.replace("\r\n", "");
-        System.out.println("------------------------------------");
-        System.out.println(httpContent);
-        System.out.println("------------------------------------");
-    }
+
 }

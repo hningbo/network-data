@@ -15,38 +15,35 @@ public class Listener21CN extends AbstractWebMailListener {
 
     @Override
         public void gotPacket(Packet packet) {
+
         TcpPacket tcpPacket;
         IpV4Packet ipV4Packet;
+
         boolean mailSendMatch;
         boolean attachmentMatch;
-        boolean mailRecieveMatch;
+
         Pattern mailSendPattern = Pattern.compile(".*POST.*sendMail.do.*");
         Pattern attachmentPattern = Pattern.compile(".*POST.*upload.do.*");
-        Pattern mailRecievePattern = Pattern.compile(".*POST.*readMail.do.*");
+
         try {
             ipV4Packet = IpV4Packet.newPacket(packet.getPayload().getRawData(), 0, packet.getPayload().length());
             tcpPacket = TcpPacket.newPacket(packet.getPayload().getPayload().getRawData(), 0, packet.getPayload().getPayload().length());
-            if (tcpPacket.getHeader().getDstPort().valueAsInt() == 80 || tcpPacket.getHeader().getSrcPort().valueAsInt() == 80) {
+
+            if (tcpPacket.getHeader().getDstPort().valueAsInt() == 80) {
                 String httpContent = EnDeCoder.hexStringToString(tcpPacket.toHexString());
                 mailSendMatch = mailSendPattern.matcher(httpContent).find();
                 attachmentMatch = attachmentPattern.matcher(httpContent).find();
+
                 TCPTuple tuple = new TCPTuple(ipV4Packet.getHeader().getSrcAddr(), ipV4Packet.getHeader().getDstAddr(), tcpPacket.getHeader().getSrcPort().valueAsInt(), tcpPacket.getHeader().getDstPort().valueAsInt());
                 //System.out.println(tuple);
-                if (mailSendMatch || attachmentMatch) {
+
+                if (attachmentMatch || (mailSendMatch && !cache.containsKey(tuple))) {
                     List<TcpPacket> packetList = new ArrayList<>();
                     packetList.add(tcpPacket);
                     cache.put(tuple, packetList);
-                    System.out.println("***********"+tuple+"************");
+                    System.out.println("Find the tcp packet match the pattern... : "+tuple);
                     return;
                 }
-//                mailRecieveMatch = mailRecievePattern.matcher(httpContent).find();
-//                if (mailRecieveMatch) {
-//                    List<TcpPacket> packetList = new ArrayList<>();
-//                    packetList.add(tcpPacket);
-//                    cache.put(tuple, packetList);
-//                    System.out.println("***********"+tuple+"************");
-//                    return;
-//                }
 
                 if (cache.containsKey(tuple)) {
                     List<TcpPacket> packetList = cache.get(tuple);

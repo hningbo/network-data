@@ -8,7 +8,7 @@ import org.bson.Document;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MongoHandler {
+public class MongoHandler implements MailDao{
     private MongoClient mongoClient;
     private MongoDatabase db;
     private MongoCollection<Document> collection;
@@ -16,11 +16,16 @@ public class MongoHandler {
     public MongoHandler(String host, int port) {
         mongoClient = new MongoClient(host, port);
         db = mongoClient.getDatabase("netdata");
-        collection = db.getCollection("mail");
+        collection = db.getCollection("enron");
 
     }
 
-    public void insertOne(Map<String, Object> email) {
+    public MongoClient getMongoClient() {
+        return mongoClient;
+    }
+
+    @Override
+    public void insertMail(Map email) {
         try {
             collection.insertOne(new Document(email));
         } catch (Exception e) {
