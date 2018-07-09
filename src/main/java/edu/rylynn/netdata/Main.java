@@ -25,7 +25,7 @@ public class Main {
 //        handle.loop(COUNT, listener);
         PcapHandle handle;
         try {
-            handle = Pcaps.openOffline("./21cn_attachment.gz.pcap");
+            handle = Pcaps.openOffline("./21cn_pic.pcap");
             int COUNT = 0;
             AbstractWebMailListener listener = new Listener21CN();
             new Processor21CN(listener).start();

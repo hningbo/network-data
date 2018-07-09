@@ -1,10 +1,15 @@
 package edu.rylynn.netdata.core.mail.processor;
 
 import edu.rylynn.netdata.core.mail.listener.AbstractWebMailListener;
+import edu.rylynn.netdata.util.EnDeCoder;
+import edu.rylynn.netdata.util.FileUtil;
+import org.pcap4j.packet.TcpPacket;
+import org.pcap4j.util.ByteArrays;
 
 import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,7 +21,71 @@ public class Processor21CN extends AbstractProcessor {
     }
 
     @Override
-    public void sendMailExtract(String httpContent) {
+    public void sendMailExtract(List<TcpPacket> packets) {
+        StringBuilder tempHttpRequestContent = new StringBuilder();
+        Pattern attachmentBeginSignal = Pattern.compile(".*WebKitFormBoundary.*filename.*");
+        Pattern attachmentEndSignal = Pattern.compile(".*WebKitFormBoundary.*");
+        Pattern isUploadSignal = Pattern.compile("POST.*upload.do.*");
+        Pattern isMailSignal = Pattern.compile("sendMail.do");
+
+        String filename = null;
+        byte[] attachmentData = null;
+
+        boolean isAttachment = false;
+        boolean isMail = false;
+        for (TcpPacket tcpPacket : packets) {
+
+            byte[] thisRawData;
+            try {
+                thisRawData = tcpPacket.getPayload().getRawData();
+            } catch (NullPointerException e) {
+                continue;
+            }
+            String thisHexString = ByteArrays.toHexString(thisRawData, "");
+            String thisContent = EnDeCoder.hexStringToString(thisHexString);
+
+            Matcher attachmentBeginMatcher = attachmentBeginSignal.matcher(thisContent.replaceAll("\r\n", ""));
+            Matcher attachmentEndMatcher = attachmentEndSignal.matcher(thisContent.replaceAll("\r\n", ""));
+            Matcher sendMailMatcher = isMailSignal.matcher(thisContent.replaceAll("\r\n", ""));
+
+            if (attachmentBeginMatcher.find()) {
+                System.out.println(thisContent);
+                if (!isAttachment) {
+                    String tempFilename = "";
+
+                    Matcher m = Pattern.compile("filename=\".*\"").matcher(thisContent.replaceAll("\r\n", ""));
+                    if (m.find()) {
+                        tempFilename = m.group();
+                    }
+                    filename = tempFilename.substring(tempFilename.indexOf("\"") + 1, tempFilename.lastIndexOf("\""));
+                }
+                isAttachment = true;
+
+                continue;
+            }
+
+            if (attachmentEndMatcher.find()) {
+                if (isAttachment) {
+                    isAttachment = false;
+                }
+                continue;
+            }
+
+            if (isAttachment) {
+                attachmentData = tcpPacket.getPayload().getRawData();
+                FileUtil.writeIntoBinaryFile(filename, attachmentData);
+                continue;
+            }
+
+
+            if (isMail) {
+                tempHttpRequestContent.append(thisContent).append("\n");
+                continue;
+            }
+        }
+
+        String httpContent = tempHttpRequestContent.toString();
+
         Map<String, Object> form = new HashMap<>();
 
         try {
@@ -56,7 +125,7 @@ public class Processor21CN extends AbstractProcessor {
         }
 
         form.put("time", new Date().toString());
-        handler.insertMail(form);
+        //handler.insertMail(form);
     }
 
 

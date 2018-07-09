@@ -26,17 +26,18 @@ public abstract class AbstractProcessor extends Thread {
 
     //tcp 重组以及还原http协议内容
     public void process() {
+
+        Set<Integer> existSeq = new HashSet<>();   // 防止重传的数据重复出现
+
         if (cache.size() != 0) {
             for (Map.Entry<TCPTuple, List<TcpPacket>> entry : cache.entrySet()) {
-                List<TcpPacket> packets = entry.getValue();
 
+                List<TcpPacket> packets = entry.getValue();
 
                 TcpPacket metaRequestPacket = packets.get(0);
 
                 int srcPort = metaRequestPacket.getHeader().getSrcPort().valueAsInt();
                 int dstPort = metaRequestPacket.getHeader().getDstPort().valueAsInt();
-
-                StringBuilder tempHttpRequestContent = new StringBuilder();
 
                 Collections.sort(packets, new Comparator<TcpPacket>() {
                     @Override
@@ -45,26 +46,25 @@ public abstract class AbstractProcessor extends Thread {
                     }
                 });
 
-;
-
-                for (TcpPacket tcpPacket : packets) {
-                    byte[] thisRawData;
-                    try {
-                        thisRawData = tcpPacket.getPayload().getRawData();
-                    }catch (NullPointerException e){
-                        continue;
+                // 预遍历一遍去除重传的数据
+                List<TcpPacket> additionPackets = new ArrayList<>();
+                for(TcpPacket tcpPacket : packets){
+                    int seq = tcpPacket.getHeader().getSequenceNumber();
+                    if(existSeq.contains(seq)){
+                        additionPackets.add(tcpPacket);
                     }
-                    String thisHexString = ByteArrays.toHexString(thisRawData, "");
-                    tempHttpRequestContent.append(EnDeCoder.hexStringToString(thisHexString)).append("\n");
+                    else{
+                        existSeq.add(seq);
+                    }
                 }
+                packets.removeAll(additionPackets);
 
-                String httpRequestContent = tempHttpRequestContent.toString();
-                sendMailExtract(httpRequestContent);
+                sendMailExtract(packets);
             }
         }
     }
 
-    public abstract void sendMailExtract(String content);
+    public abstract void sendMailExtract(List<TcpPacket> packets);
 
     @Override
     public void run() {
@@ -77,7 +77,7 @@ public abstract class AbstractProcessor extends Thread {
             }
             listener.clearCache();
             try {
-                sleep(20000);
+                sleep(30000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
